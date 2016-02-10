@@ -15,8 +15,8 @@
  */
 package com.carteryagemann.AICS;
 
-import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 
 /**
  * IntentData is an object for storing the contents of the logged Android
