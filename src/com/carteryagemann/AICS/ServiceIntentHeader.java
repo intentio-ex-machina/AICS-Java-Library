@@ -30,4 +30,10 @@ public class ServiceIntentHeader extends IntentHeader {
         return ByteBuffer.allocate(100);
     }
     
+    @Override
+    public int getSize() {
+        System.err.println("ServiceIntentHeader.getSize not implemented");
+        return 0;
+    }
+    
 }

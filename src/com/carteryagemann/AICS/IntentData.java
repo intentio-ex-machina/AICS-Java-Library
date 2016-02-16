@@ -125,25 +125,29 @@ public class IntentData {
     
     public IntentData setAction(String action) {
         ACTION = action;
-        ACTION_SIZE = action.length();
+        if (action != null) ACTION_SIZE = action.length();
+        else ACTION_SIZE = 0;
         return this;
     }
     
     public IntentData setData(String data) {
         DATA = data;
-        DATA_SIZE = data.length();
+        if (data != null) DATA_SIZE = data.length();
+        else DATA_SIZE = 0;
         return this;
     }
     
     public IntentData setCategory(String category) {
         CATEGORY = category;
-        CATEGORY_SIZE = category.length();
+        if (category != null) CATEGORY_SIZE = category.length();
+        else CATEGORY_SIZE = 0;
         return this;
     }
     
     public IntentData setType(String type) {
         TYPE = type;
-        TYPE_SIZE = type.length();
+        if (type != null) TYPE_SIZE = type.length();
+        else TYPE_SIZE = 0;
         return this;
     }
     
@@ -209,6 +213,7 @@ public class IntentData {
         if (CLIPDATA_SIZE > 0) buffer.put(CLIPDATA);
         if (EXTRAS_SIZE > 0) buffer.put(EXTRAS);
         
+        buffer.rewind();
         return buffer;
     }
 }

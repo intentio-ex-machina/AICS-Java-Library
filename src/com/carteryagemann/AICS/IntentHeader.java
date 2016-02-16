@@ -15,7 +15,9 @@
  */
 package com.carteryagemann.AICS;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.text.ParseException;
 
 /**
  * An IntentHeader contains important information about an Android intent which
@@ -30,14 +32,64 @@ abstract public class IntentHeader {
     public static final short TYPE_BROADCAST = 1;
     public static final short TYPE_SERVICE = 2;
     
-    private int TIMESTAMP;
-    private short MILLI_OFFSET;
-    private short INTENT_TYPE;
-    private int CALLER_UID;
-    private int CALLER_PID;
-    private int RECEIVER_UID;
-    private int RECEIVER_PID;
-    private int USER_ID;
+    protected int TIMESTAMP;
+    protected short MILLI_OFFSET;
+    protected short INTENT_TYPE;
+    protected int CALLER_UID;
+    protected int CALLER_PID;
+    protected int RECEIVER_UID;
+    protected int RECEIVER_PID;
+    protected int USER_ID;
+    
+    protected IntentData INTENT_DATA;
+    protected int INTENT_DATA_SIZE;
+    
+    /**
+     * Returns the type of the first intent header in the buffer. The returned
+     * value can then be used to determine which constructor should be called on
+     * the buffer.
+     * 
+     * @param buffer The buffer to parse. The header must start at the current
+     * position of this buffer.
+     * @return The type of the intent header at the start of the buffer.
+     * @throws ParseException If type can't be determined
+     * @throws BufferUnderflowException If buffer is too tiny to be an intent
+     * header.
+     */
+    public static short parseIntentType(ByteBuffer buffer)
+            throws ParseException, BufferUnderflowException {
+        try {
+            short type = buffer.getShort(buffer.position() + 6);
+            // Type can only be 0, 1, or 2
+            if (type < 0 || type > 2)
+                throw new ParseException("Cannot parse intent header.",
+                        buffer.position());
+            return type;
+        } catch (BufferUnderflowException e) {
+            throw e;
+        }
+    }
+    
+    /**
+     * Returns the type of the first intent header in the buffer. The returned
+     * value can then be used to determine which constructor should be called on
+     * the buffer.
+     * 
+     * @param array The byte array to parse. The header must start at the
+     * beginning of this array.
+     * @return The type of the intent header at the start of the buffer.
+     * @throws ParseException If type can't be determined.
+     * @throws BufferUnderflowException If buffer is too tiny to be an intent
+     * header.
+     */
+    public static short parseIntentType(byte[] array)
+            throws ParseException, BufferUnderflowException {
+        try {
+            return parseIntentType(ByteBuffer.wrap(array));
+        } catch (ParseException | BufferUnderflowException e) {
+            throw e;
+        }
+    }
     
     /**
      * Sets the time for the intent this header describes. Should be in UNIX
@@ -90,6 +142,13 @@ abstract public class IntentHeader {
         return this;
     }
     
+    public IntentHeader setIntentData(IntentData data) {
+        INTENT_DATA = data;
+        if (data != null) INTENT_DATA_SIZE = data.getSize();
+        else INTENT_DATA_SIZE = 0;
+        return this;
+    }
+    
     public int getTimestamp() { return TIMESTAMP; }
     
     public short getOffset() { return MILLI_OFFSET; }
@@ -106,12 +165,23 @@ abstract public class IntentHeader {
     
     public int getUserID() { return USER_ID; }
     
+    public IntentData getIntentData() { return INTENT_DATA; }
+    
     /**
      * Convert the contents of the intent header into a ByteBuffer which is
-     * ready to be written to a file.
+     * ready to be written to a file. This buffer only contains the header.
+     * To flatten the data, use getIntentData().toByteBuffer().
      * 
      * @return A ByteBuffer containing the contents of the intent header.
      */
     abstract protected ByteBuffer toByteBuffer();
+    
+    /**
+     * Calculates the total number of bytes needed to write this header.
+     * 
+     * @return The number of bytes this header will use when flattened into
+     * a sequence of bytes.
+     */
+    abstract public int getSize();
     
 }

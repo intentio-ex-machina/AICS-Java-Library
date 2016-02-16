@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class AICSFile {
     
     private final AICSFileHeader FILE_HEADER;
-    private ArrayList<IntentPacket> INTENTS;
+    private ArrayList<IntentHeader> INTENTS;
     
     /**
      * Creates an AICSFile object by reading the contents of an AICS file.
@@ -64,7 +64,7 @@ public class AICSFile {
      * 
      * @param packet The packet to append.
      */
-    public void appendIntent(IntentPacket packet) {
+    public void appendIntent(IntentHeader packet) {
         INTENTS.add(packet);
     }
     
@@ -74,7 +74,7 @@ public class AICSFile {
      * @param index Which intent to get.
      * @return The intent at that index.
      */
-    public IntentPacket getIntent(int index) {
+    public IntentHeader getIntent(int index) {
         return INTENTS.get(index);
     }
     
