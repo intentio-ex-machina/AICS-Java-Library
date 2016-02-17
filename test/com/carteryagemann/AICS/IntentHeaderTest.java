@@ -49,6 +49,15 @@ public class IntentHeaderTest {
             fail(e.toString());
         }
         assertEquals(type, IntentHeader.TYPE_SERVICE);
+        
+        BroadcastIntentHeader broadcastHead = new BroadcastIntentHeader();
+        type = -1;
+        try {
+            type = IntentHeader.parseIntentType(broadcastHead.toByteBuffer());
+        } catch (ParseException | BufferUnderflowException e) {
+            fail(e.toString());
+        }
+        assertEquals(type, IntentHeader.TYPE_BROADCAST);
     }
     
     /**
@@ -96,5 +105,15 @@ public class IntentHeaderTest {
             fail(e.toString());
         }
         assertEquals(type, IntentHeader.TYPE_SERVICE);
+        
+        BroadcastIntentHeader broadcastHead = new BroadcastIntentHeader();
+        type = -1;
+        try {
+            type = IntentHeader.parseIntentType(broadcastHead
+                    .toByteBuffer().array());
+        } catch (ParseException | BufferUnderflowException e) {
+            fail(e.toString());
+        }
+        assertEquals(type, IntentHeader.TYPE_BROADCAST);
     }
 }
