@@ -40,6 +40,15 @@ public class IntentHeaderTest {
             fail(e.toString());
         }
         assertEquals(type, IntentHeader.TYPE_ACTIVITY);
+        
+        ServiceIntentHeader serviceHead = new ServiceIntentHeader();
+        type = -1;
+        try {
+            type = IntentHeader.parseIntentType(serviceHead.toByteBuffer());
+        } catch (ParseException | BufferUnderflowException e) {
+            fail(e.toString());
+        }
+        assertEquals(type, IntentHeader.TYPE_SERVICE);
     }
     
     /**
@@ -77,5 +86,15 @@ public class IntentHeaderTest {
             fail(e.toString());
         }
         assertEquals(type, IntentHeader.TYPE_ACTIVITY);
+        
+        ServiceIntentHeader serviceHead = new ServiceIntentHeader();
+        type = -1;
+        try {
+            type = IntentHeader.parseIntentType(serviceHead
+                    .toByteBuffer().array());
+        } catch (ParseException | BufferUnderflowException e) {
+            fail(e.toString());
+        }
+        assertEquals(type, IntentHeader.TYPE_SERVICE);
     }
 }
