@@ -17,6 +17,8 @@ package com.carteryagemann.AICS;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.text.ParseException;
+import java.nio.BufferUnderflowException;
 
 /**
  * An Android Intent Capture Session file. The file is organized into a fixed
@@ -28,19 +30,83 @@ import java.util.ArrayList;
  */
 public class AICSFile {
     
+    private final static String MAGIC_PARSE_ERROR = "Failed to read magic "
+            + "number. File is either corrupt or in little endian order "
+            + "(currently not implemented).";
+    
     private final AICSFileHeader FILE_HEADER;
-    private ArrayList<IntentHeader> INTENTS;
+    private final ArrayList<IntentHeader> INTENTS;
     
     /**
-     * Creates an AICSFile object by reading the contents of an AICS file.
+     * Creates an AICSFile object from a ByteBuffer.
      * 
-     * @param filepath The path to the AICS file.
-     * @return An AICSFile object containing the contents of the file.
+     * @param buffer The buffer to parse.
+     * @return An AICSFile.
+     * @throws java.text.ParseException If the buffer can't be parsed.
      */
-    public static AICSFile readFromFile(String filepath) {
-        //TODO Implement method
-        System.err.println("Method AICSFile.readFromFile not implemented!");
-        return null;
+    public static AICSFile readFromBuffer(ByteBuffer buffer)
+            throws ParseException {
+        
+        /* Read File Header */
+        
+        // Magic Number
+        int magic = buffer.getInt();
+        if (magic != AICSFileHeader.MAGIC_NUMBER)
+            throw new ParseException(MAGIC_PARSE_ERROR, buffer.position());
+        
+        // File Format Version
+        short formatMajor = buffer.getShort();
+        short formatMinor = buffer.getShort();
+        if (formatMajor != AICSFileHeader.FORMAT_MAJOR_VERSION ||
+                formatMinor != AICSFileHeader.FORMAT_MINOR_VERSION)
+            throw new ParseException("File's format version " + formatMajor +
+                    "." + formatMinor + " does not match library's supported" +
+                    "version " + AICSFileHeader.FORMAT_MAJOR_VERSION + "." +
+                    AICSFileHeader.FORMAT_MINOR_VERSION, buffer.position());
+        
+        // Android Version
+        AICSFile file = new AICSFile(buffer.getShort(), buffer.get(),
+                buffer.get());
+        
+        /* Read Intents */
+        
+        // Every header has to have at least 8 bytes for the timestamp, offset,
+        // and intent type.
+        while (buffer.remaining() > 8) {
+            try { // Try to parse the intent
+                switch (IntentHeader.parseIntentType(buffer)) {
+                    case IntentHeader.TYPE_ACTIVITY:
+                        file.appendIntent(new ActivityIntentHeader(buffer));
+                        break;
+                    case IntentHeader.TYPE_BROADCAST:
+                        file.appendIntent(new BroadcastIntentHeader(buffer));
+                        break;
+                    case IntentHeader.TYPE_SERVICE:
+                        file.appendIntent(new ServiceIntentHeader(buffer));
+                        break;
+                }
+            } catch (BufferUnderflowException | ParseException e) {
+                System.err.println(e.toString());
+                return file; // Return as much as we could parse.
+            }
+        }
+        
+        return file; // Success!
+    }
+    
+    /**
+     * Creates an AICSFile from an array of bytes.
+     * 
+     * @param array The array to parse.
+     * @return An AICSFile.
+     * @throws java.text.ParseException If buffer can't be parsed.
+     */
+    public static AICSFile readFromArray(byte[] array) throws ParseException {
+        try {
+            return readFromBuffer(ByteBuffer.wrap(array));
+        } catch (BufferUnderflowException | ParseException e) {
+            throw e;
+        }
     }
     
     /**
@@ -64,9 +130,7 @@ public class AICSFile {
      * 
      * @param packet The packet to append.
      */
-    public void appendIntent(IntentHeader packet) {
-        INTENTS.add(packet);
-    }
+    public void appendIntent(IntentHeader packet) { INTENTS.add(packet); }
     
     /**
      * Get the intent at the provided index.
@@ -74,34 +138,29 @@ public class AICSFile {
      * @param index Which intent to get.
      * @return The intent at that index.
      */
-    public IntentHeader getIntent(int index) {
-        return INTENTS.get(index);
-    }
+    public IntentHeader getIntent(int index) { return INTENTS.get(index); }
     
     /**
      * Deletes all the intents in this file.
      */
-    public void clearIntents() {
-        INTENTS.clear();
-    }
+    public void clearIntents() { INTENTS.clear(); }
     
     /**
      * Returns how many intents are in this file.
      * 
      * @return The number of intents in this file.
      */
-    public int size() {
-        return INTENTS.size();
-    }
+    public int size() { return INTENTS.size(); }
     
     /**
-     * Writes the AICSFile to a file at the designated file path.
+     * Flattens the AICSFile into a ByteBuffer for writing.
      * 
-     * @param filepath The location where the AICS file should be written.
+     * @return A ByteBuffer containing the flattened version of the file.
      */
-    public void writeToFile(String filepath) {
+    public ByteBuffer toByteBuffer() {
         //TODO Implement method
-        System.err.println("Method AICSFile.writeToFile not implemented!");
+        System.err.println("Method AICSFile.toByteBuffer not implemented!");
+        return null;
     }
     
     /**
@@ -121,9 +180,9 @@ public class AICSFile {
      */
     private class AICSFileHeader {
         
-        private final int MAGIC_NUMBER = 0xA1B2C3D4;
-        private final short FORMAT_MAJOR_VERSION = 0;
-        private final short FORMAT_MINOR_VERSION = 1;
+        public final static int MAGIC_NUMBER = 0xA1B2C3D4;
+        public final static short FORMAT_MAJOR_VERSION = 0;
+        public final static short FORMAT_MINOR_VERSION = 1;
         
         private final short ANDROID_MAJOR_VERSION;
         private final byte ANDROID_MINOR_VERSION;
