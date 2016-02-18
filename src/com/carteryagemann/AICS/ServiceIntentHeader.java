@@ -22,7 +22,7 @@ import java.text.ParseException;
 /**
  * A header for service intents.
  * 
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 public class ServiceIntentHeader extends IntentHeader {
     
@@ -100,7 +100,7 @@ public class ServiceIntentHeader extends IntentHeader {
                 buffer.get(temp);
                 ACTION = new String(temp);
             }
-            INTENT_DATA = new IntentData(buffer.slice());
+            INTENT_DATA = new IntentData(buffer);
         } catch (BufferUnderflowException e) {
             throw e;
         }

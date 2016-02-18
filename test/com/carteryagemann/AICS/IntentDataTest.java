@@ -76,7 +76,7 @@ public class IntentDataTest {
     public void testToByteBuffer() {
         // Blank IntentData test
         IntentData instance = new IntentData();
-        byte[] expResult = new byte[224];
+        byte[] expResult = new byte[7*4];
         Arrays.fill(expResult, (byte) 0);
         byte[] result = instance.toByteBuffer().array();
         assertArrayEquals(expResult, result);
@@ -269,7 +269,7 @@ public class IntentDataTest {
                 .setType(type)
                 .setClipData(clipdata)
                 .setExtras(extras);
-        int expResult = 32 * 7 + action.length() + data.length()
+        int expResult = 4 * 7 + action.length() + data.length()
                 + category.length() + type.length() + clipdata.length
                 + extras.length;
         int result = instance.getSize();

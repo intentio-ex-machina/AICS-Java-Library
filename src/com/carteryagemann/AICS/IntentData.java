@@ -19,11 +19,11 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 /**
- * IntentData is an object for storing the contents of the logged Android
- * intent. It should be combined with an IntentHeader to create an IntentPacket
- * which can then be stored inside an AICSFile.
+ * An object for storing the contents of an Android intent. It should be
+ * combined with an intent header to create a complete packet which can then be
+ * stored inside an AICS file.
  * 
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 public class IntentData {
     
@@ -184,7 +184,7 @@ public class IntentData {
      * a sequence of bytes.
      */
     public int getSize() {
-        return 32 * 7 + ACTION_SIZE + DATA_SIZE + CATEGORY_SIZE + TYPE_SIZE
+        return 4 * 7 + ACTION_SIZE + DATA_SIZE + CATEGORY_SIZE + TYPE_SIZE
                 + CLIPDATA_SIZE + EXTRAS_SIZE;
     }
     

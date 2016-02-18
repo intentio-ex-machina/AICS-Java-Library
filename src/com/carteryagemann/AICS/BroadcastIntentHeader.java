@@ -22,7 +22,7 @@ import java.text.ParseException;
 /**
  * A header for broadcast intents.
  * 
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 public class BroadcastIntentHeader extends IntentHeader {
     
@@ -103,7 +103,7 @@ public class BroadcastIntentHeader extends IntentHeader {
                 buffer.get(temp);
                 REQUIRED_PERMISSION = new String(temp);
             }
-            INTENT_DATA = new IntentData(buffer.slice());
+            INTENT_DATA = new IntentData(buffer);
         } catch (BufferUnderflowException e) {
             throw e;
         }

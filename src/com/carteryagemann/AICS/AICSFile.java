@@ -26,7 +26,7 @@ import java.nio.BufferUnderflowException;
  * file is represented as a header, containing meta information about the
  * intent, and the intent itself.
  *
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 public class AICSFile {
     
@@ -46,6 +46,8 @@ public class AICSFile {
      */
     public static AICSFile readFromBuffer(ByteBuffer buffer)
             throws ParseException {
+        
+        int originalPos = buffer.position();
         
         /* Read File Header */
         
@@ -87,10 +89,12 @@ public class AICSFile {
                 }
             } catch (BufferUnderflowException | ParseException e) {
                 System.err.println(e.toString());
+                buffer.position(originalPos); // Restore original position
                 return file; // Return as much as we could parse.
             }
         }
         
+        buffer.position(originalPos); // Restore original position
         return file; // Success!
     }
     
@@ -129,8 +133,12 @@ public class AICSFile {
      * session.
      * 
      * @param packet The packet to append.
+     * @return Itself.
      */
-    public void appendIntent(IntentHeader packet) { INTENTS.add(packet); }
+    public AICSFile appendIntent(IntentHeader packet) {
+        INTENTS.add(packet);
+        return this;
+    }
     
     /**
      * Get the intent at the provided index.
@@ -142,8 +150,13 @@ public class AICSFile {
     
     /**
      * Deletes all the intents in this file.
+     * 
+     * @return Itself.
      */
-    public void clearIntents() { INTENTS.clear(); }
+    public AICSFile clearIntents() {
+        INTENTS.clear();
+        return this;
+    }
     
     /**
      * Returns how many intents are in this file.
@@ -158,9 +171,22 @@ public class AICSFile {
      * @return A ByteBuffer containing the flattened version of the file.
      */
     public ByteBuffer toByteBuffer() {
-        //TODO Implement method
-        System.err.println("Method AICSFile.toByteBuffer not implemented!");
-        return null;
+        
+        int size = 0;
+        size += FILE_HEADER.getSize(); // File header first...
+        for (IntentHeader intent : INTENTS) // ... then the intents
+            size += intent.getSize() + intent.getIntentData().getSize();
+        
+        // Merge list of buffers into one buffer
+        ByteBuffer output = ByteBuffer.allocate(size);
+        output.put(FILE_HEADER.toByteBuffer());
+        for (IntentHeader intent : INTENTS) {
+            output.put(intent.toByteBuffer());
+            output.put(intent.getIntentData().toByteBuffer());
+        }
+        
+        output.rewind();
+        return output;
     }
     
     /**
@@ -209,13 +235,19 @@ public class AICSFile {
          * @return A ByteBuffer containing the file header.
          */
         protected ByteBuffer toByteBuffer() {
-            return ByteBuffer.allocate(96)
+            ByteBuffer buffer = ByteBuffer.allocate(12)
                     .putInt(MAGIC_NUMBER)
                     .putShort(FORMAT_MAJOR_VERSION)
                     .putShort(FORMAT_MINOR_VERSION)
                     .putShort(ANDROID_MAJOR_VERSION)
                     .put(ANDROID_MINOR_VERSION)
                     .put(ANDROID_PATCH_VERSION);
+            buffer.rewind();
+            return buffer;
+        }
+        
+        protected int getSize() {
+            return 12; // File header is fixed size
         }
     }
 }

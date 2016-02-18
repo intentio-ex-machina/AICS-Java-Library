@@ -20,11 +20,11 @@ import java.nio.ByteBuffer;
 import java.text.ParseException;
 
 /**
- * An IntentHeader contains important information about an Android intent which
+ * A header contains important information about an Android intent which
  * isn't contained in the intent itself. This includes information such as the
  * sender and receiver of the intent.
  * 
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 abstract public class IntentHeader {
     
@@ -107,7 +107,7 @@ abstract public class IntentHeader {
      * The millisecond offset for the intent this header describes.
      * 
      * @param milli The offset from the time in milliseconds.
-     * @return 
+     * @return Itself.
      * @throws IllegalArgumentException Offset cannot be negative and must be
      * less than a second.
      */

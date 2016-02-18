@@ -22,7 +22,7 @@ import java.text.ParseException;
 /**
  * A header for activity intents.
  * 
- * @author Carter Yagemann <carter.yagemann@gmail.com>
+ * @author Carter Yagemann
  */
 public class ActivityIntentHeader extends IntentHeader {
 
@@ -102,7 +102,7 @@ public class ActivityIntentHeader extends IntentHeader {
                 OPTIONS = new byte[OPTIONS_SIZE];
                 buffer.get(OPTIONS);
             }
-            INTENT_DATA = new IntentData(buffer.slice());
+            INTENT_DATA = new IntentData(buffer);
         } catch (BufferUnderflowException e) {
             throw e;
         }
