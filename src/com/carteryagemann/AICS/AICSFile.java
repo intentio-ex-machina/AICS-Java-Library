@@ -123,7 +123,7 @@ public class AICSFile {
      * @param patch The patch Android version upon which the intents logged to
      * this file were captured on.
      */
-    AICSFile(short major, byte minor, byte patch) {
+    public AICSFile(short major, byte minor, byte patch) {
         FILE_HEADER = new AICSFileHeader(major, minor, patch);
         INTENTS = new ArrayList<>();
     }
