@@ -44,7 +44,7 @@ public class IntentData {
     /**
      * The default constructor initializes all the fields as null and size 0.
      */
-    IntentData() {
+    public IntentData() {
         FLAGS = 0;
         ACTION_SIZE = 0;
         DATA_SIZE = 0;
@@ -60,7 +60,7 @@ public class IntentData {
      * @param buffer The ByteBuffer containing a flattened IntentData object.
      * @throws BufferUnderflowException If the buffer is malformed.
      */
-    IntentData(ByteBuffer buffer) throws BufferUnderflowException {
+    public IntentData(ByteBuffer buffer) throws BufferUnderflowException {
         try {
             FLAGS = buffer.getInt();
             ACTION_SIZE = buffer.getInt();
@@ -114,7 +114,7 @@ public class IntentData {
      * @param array The array to parse into an IntentData object.
      * @throws BufferUnderflowException If the array is malformed.
      */
-    IntentData(byte[] array) throws BufferUnderflowException {
+    public IntentData(byte[] array) throws BufferUnderflowException {
         this(ByteBuffer.wrap(array));
     }
     
